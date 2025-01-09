@@ -30,28 +30,44 @@ final class ConversationViewModel: ConversationViewModelType, ConversationViewMo
     var outputs: any ConversationViewModelOutputType { return self }
 
     private let dataManager: DataManager
+    private let dateFormatter: DateFormatter
     private let currentUserId: String
+    private let maxWidth: CGFloat
+    private let minWidth: CGFloat
     private let cancellables: Set<AnyCancellable>
 
     init() {
+        self.dateFormatter = DateFormatter()
+        self.dateFormatter.locale = Locale(identifier: "en_US")
+        self.dateFormatter.dateFormat = "HH:mm"
         self.dataManager = .shared
         self.cancellables = Set<AnyCancellable>()
         self.currentUserId = UserDefaults.standard.string(forKey: "userId")!
+        self.maxWidth = UIScreen.main.bounds.width * Constants.maxWidthCoefficient
+        self.minWidth = UIScreen.main.bounds.width * Constants.minWidthCoefficient
     }
 
     // MARK: Inputs
 
     func onSendMessage(_ message: String) {
-        let cellModel = MessageCellModel(
-            id: UUID().uuidString,
+        let id = UUID().uuidString
+        let date = Date()
+        let cellModel = makeMessageCellModel(
+            id: id,
             message: message,
-            senderName: "Sceyt",
-            sentDate: "13:34",
-            contentHeight: 112,
-            contentWidth: 123,
-            kind: .current
+            senderName: "",
+            senderId: currentUserId,
+            date: date
+        )!
+
+        dataManager.saveMessage(
+            body: message,
+            id: id,
+            senderName: "",
+            senderId: currentUserId,
+            date: date
         )
-        dataManager.saveMessage(body: message, id: UUID().uuidString, senderName: "Sceyt", senderId: currentUserId)
+
         _messagesCellModels.append(cellModel)
     }
 
@@ -91,40 +107,50 @@ final class ConversationViewModel: ConversationViewModelType, ConversationViewMo
 
 private extension ConversationViewModel {
     func transform(messages: [CDMessage]) -> [MessageCellModel] {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US")
-        formatter.dateFormat = "HH:mm"
-        let maxWidth = UIScreen.main.bounds.width * Constants.maxWidthCoefficient
-        let minWidth = UIScreen.main.bounds.width * Constants.minWidthCoefficient
-
         return messages.compactMap {
-            if let id = $0.id, let message = $0.body, let name = $0.senderName, let date = $0.date {
-                let font = UIFont.systemFont(ofSize: 16.0, weight: .regular)
-                let contentHeight = message.height(withConstrainedWidth: maxWidth, font: font) + 18.0
-                let messageWidth = message.width(withConstrainedHeight: contentHeight, font: font) + 16.0
-                
-                let contentWidth = if messageWidth < minWidth {
-                    minWidth
-                } else if messageWidth > maxWidth {
-                    maxWidth
-                } else {
-                    messageWidth
-                }
-
-                let timeString = formatter.string(from: date)
-
-                return MessageCellModel(
-                    id: id,
-                    message: message,
-                    senderName: name,
-                    sentDate: timeString,
-                    contentHeight: contentHeight,
-                    contentWidth: contentWidth,
-                    kind: currentUserId == $0.senderId ? .current: .other
-                )
-            }
-
+            makeMessageCellModel(
+                id: $0.id,
+                message: $0.body,
+                senderName: $0.senderName,
+                senderId: $0.senderId,
+                date: $0.date
+            )
+        }
+    }
+    
+    func makeMessageCellModel(
+        id: String?,
+        message: String?,
+        senderName: String?,
+        senderId: String?,
+        date: Date?
+    ) -> MessageCellModel? {
+        guard let id, let message, let senderName, let senderId, let date else {
             return nil
         }
+
+        let font = UIFont.systemFont(ofSize: 16.0, weight: .regular)
+        let contentHeight = message.height(withConstrainedWidth: maxWidth, font: font) + 18.0
+        let messageWidth = message.width(withConstrainedHeight: contentHeight, font: font) + 16.0
+        
+        let contentWidth = if messageWidth < minWidth {
+            minWidth
+        } else if messageWidth > maxWidth {
+            maxWidth
+        } else {
+            messageWidth
+        }
+
+        let timeString = dateFormatter.string(from: date)
+
+        return MessageCellModel(
+            id: id,
+            message: message,
+            senderName: senderName,
+            sentDate: timeString,
+            contentHeight: contentHeight,
+            contentWidth: maxWidth,
+            kind: currentUserId == senderId ? .current: .other
+        )
     }
 }

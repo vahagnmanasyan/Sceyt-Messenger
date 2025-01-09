@@ -7,6 +7,8 @@
 
 import UIKit
 
+let mockMessage = "Lorem ipsum odor amet, consectetuer adipiscing elit. Consectetur tincidunt fermentum at himenaeos dictumst? Massa auctor lobortis curae taciti amet commodo, vulputate praesent lorem. Gravida nisl dapibus gravida mus penatibus eros. Condimentum elementum torquent lobortis quis pretium ultricies ad. Pellentesque leo nam nisi elementum neque massa vulputate mus taciti. Bibendum felis mollis; ridiculus nascetur dapibus est ipsum molestie."
+
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -19,6 +21,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         if UserDefaults.standard.value(forKey: "isMockDataGenerated") == nil {
             UserDefaults.standard.set(true, forKey: "isMockDataGenerated")
+            
+            for _ in 0..<2000 {
+                let randomId = (1000...10000).randomElement()!
+                DataManager.shared.saveMessage(
+                    body: mockMessage,
+                    id: UUID().uuidString,
+                    senderName: "User\(randomId)",
+                    senderId: UUID().uuidString,
+                    date: Date()
+                )
+            }
             
         }
         

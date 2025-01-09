@@ -174,7 +174,7 @@ private extension ConversationViewController {
 class DataManager {
     static let shared = DataManager()
 
-    var persistentContainer: NSPersistentContainer = {
+    private var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "Database")
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
@@ -184,7 +184,7 @@ class DataManager {
         return container
     }()
     
-    var context: NSManagedObjectContext {
+    private var context: NSManagedObjectContext {
         return persistentContainer.viewContext
     }
     
@@ -200,14 +200,14 @@ class DataManager {
         }
     }
 
-    func saveMessage(body: String, id: String, senderName: String, senderId: String) {
+    func saveMessage(body: String, id: String, senderName: String, senderId: String, date: Date) {
         do {
             let message = CDMessage(context: context)
             message.body = body
             message.id = id
             message.senderName = senderName
             message.senderId = senderId
-            message.date = Date()
+            message.date = date
             try context.save()
         } catch {
             print(error)
