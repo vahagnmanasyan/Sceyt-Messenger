@@ -1,0 +1,9 @@
+/* 
+  Localizable.strings
+  Sceyt Messenger
+
+  Created by Vahagn Manasyan on 10.01.25.
+  
+*/
+
+"converstaion.text.field.placeholder" = "Write a message...";
