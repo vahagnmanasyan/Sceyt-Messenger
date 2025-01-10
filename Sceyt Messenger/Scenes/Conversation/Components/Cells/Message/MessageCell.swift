@@ -85,10 +85,10 @@ final class MessageCell: UICollectionViewCell {
                 await attachedImageView.setImage(from: photoUrl)
             }
             
-            mediaHeightAnchor?.constant = 200.0
+            mediaHeightAnchor?.constant = 260.0
         } else if let image = cellModel.image {
             attachedImageView.image = image
-            mediaHeightAnchor?.constant = 200.0
+            mediaHeightAnchor?.constant = 260.0
         } else {
             mediaHeightAnchor?.constant = 0.0
         }

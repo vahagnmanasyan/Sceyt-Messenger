@@ -66,7 +66,9 @@ final class ConversationViewModel: ConversationViewModelType, ConversationViewMo
             image: attachedImages.first
         )!
         
-        attachedImages.removeFirst()
+        if !attachedImages.isEmpty {
+            attachedImages.removeFirst()
+        }
 
         dataManager.saveMessage(
             body: message,
@@ -173,22 +175,26 @@ private extension ConversationViewModel {
             return nil
         }
 
-        let font = UIFont.systemFont(ofSize: 16.0, weight: .regular)
-        // 18.0
-        var contentHeight = message.height(withConstrainedWidth: maxWidth, font: font) + 100
-        let messageWidth = message.width(withConstrainedHeight: contentHeight, font: font) + 16.0
+        let isIncomingMessage = currentUserId != senderId
+        let nameFont = UIFont.systemFont(ofSize: 16.0, weight: .bold)
+        let messageFont = UIFont.systemFont(ofSize: 16.0, weight: .regular)
 
-        var contentWidth = if messageWidth < minWidth {
-            minWidth
+        let padding = 8.0
+        let nameHeight = !isIncomingMessage ? senderName.height(withConstrainedWidth: maxWidth, font: nameFont): 0.0
+        let textHeight = !message.isEmpty ? message.height(withConstrainedWidth: maxWidth, font: messageFont): 0.0
+        let imageHeight = photoUrl != nil ? 260.0 : 0.0
+        let contentHeight = nameHeight + textHeight + imageHeight
+
+        let messageWidth = !message.isEmpty ? message.width(withConstrainedHeight: contentHeight, font: messageFont): 0.0
+        
+        let contentWidth = if photoUrl != nil {
+            maxWidth
         } else if messageWidth > maxWidth {
             maxWidth
+        } else if messageWidth < minWidth {
+            minWidth
         } else {
             messageWidth
-        }
-
-        if let _ = image {
-            contentHeight += 115
-            contentWidth = maxWidth
         }
 
         let timeString = dateFormatter.string(from: date)
@@ -199,7 +205,7 @@ private extension ConversationViewModel {
             senderName: senderName,
             sentDate: timeString,
             contentHeight: contentHeight,
-            contentWidth: maxWidth,
+            contentWidth: contentWidth,
             photoUrl: photoUrl,
             kind: currentUserId == senderId ? .current: .other,
             image: image,
