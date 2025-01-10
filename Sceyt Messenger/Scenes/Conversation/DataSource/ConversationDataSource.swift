@@ -18,10 +18,8 @@ protocol ConversationDataSourceType: AnyObject {
 final class ConversationDataSource: NSObject, ConversationDataSourceType {
 
     internal enum RequestAction {
-//        case retryMessage(Message)
         case deleteMessage(MessageCellModel)
-//        case copy(Message)
-//        case report(Message)
+        case copy(MessageCellModel)
     }
 
     private let dataSource: DataSource
@@ -41,13 +39,6 @@ final class ConversationDataSource: NSObject, ConversationDataSourceType {
             return cell
         }
 
-//        dataSource.supplementaryViewProvider = { collectionView, elementKind, indexPath in
-//            if elementKind == UICollectionView.elementKindSectionFooter {
-//                return collectionView.dequeueFooter(ofType: MessagesDateFooterView.self, at: indexPath)
-//            }
-//            return nil
-//        }
-
         super.init()
 
         self.collectionView.delegate = self
@@ -58,43 +49,13 @@ final class ConversationDataSource: NSObject, ConversationDataSourceType {
         self.sectionIdentifiers = snapshot.sectionIdentifiers
         dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
     }
-
-//    func messageType(at indexPath: IndexPath)-> MessageType? {
-//        let itemIdentifier = dataSource.itemIdentifier(for: indexPath)
-//        if case .message(let messageType) = itemIdentifier {
-//            return messageType
-//        }
-//        return nil
-//    }
 }
 
 
-// MARK: - ChatCollectionViewDelegate
+// MARK: - UICollectionViewDelegate
 
 extension ConversationDataSource: UICollectionViewDelegate {
-
-    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-//        if let textMessageCell = cell as? TextMessageCell {
-//            textMessageCell.delegate = self
-//        }
-    }
-
-//    func collectionView(_ collectionView: UICollectionView, willDisplaySupplementaryView view: UICollectionReusableView, forElementKind elementKind: String, at indexPath: IndexPath) {
-//        if elementKind == UICollectionView.elementKindSectionFooter {
-//            if let messageDateFooter = view as? MessagesDateFooterView {
-//                if #available(iOS 15.0, *) {
-//                    if let sectionModel = dataSource.sectionIdentifier(for: indexPath.section) {
-//                        messageDateFooter.configure(sectionDate: sectionModel.sectionDate)
-//                    }
-//                } else {
-//                    let sectionModel = sectionIdentifiers[indexPath.section]
-//                    messageDateFooter.configure(sectionDate: sectionModel.sectionDate)
-//                }
-//            }
-//        }
-//    }
-
-    public func collectionView(_ collectionView: UICollectionView, previewForHighlightingContextMenuWithConfiguration configuration: UIContextMenuConfiguration) -> UITargetedPreview? {
+    func collectionView(_ collectionView: UICollectionView, previewForHighlightingContextMenuWithConfiguration configuration: UIContextMenuConfiguration) -> UITargetedPreview? {
 
         guard let indexPath = configuration.identifier as? IndexPath,
               let cell = collectionView.cellForItem(at: indexPath) else {
@@ -111,22 +72,29 @@ extension ConversationDataSource: UICollectionViewDelegate {
         return UITargetedPreview(view: cell, parameters: parameters)
     }
 
-    public func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        contextMenuConfigurationForItemAt indexPath: IndexPath,
+        point: CGPoint
+    ) -> UIContextMenuConfiguration? {
+        guard let sectionItem = dataSource.itemIdentifier(for: indexPath) else {
+            return nil
+        }
 
         let copyTitle = "Copy"
         let copyIcon = UIImage(systemName: "doc.on.doc")
 
         let copy = UIAction(title: copyTitle, image: copyIcon) { [weak self] _ in
-            //            self?.onRequestAction?(.copy(textMessageModel.message))
+            self?.onRequestAction?(.copy(sectionItem))
         }
-            
+
         var menuElements = [UIMenuElement]()
-        
+
         let deleteTitle = "Delete"
         let deleteImage = UIImage(systemName: "trash")
         let attributes = UIMenu.Attributes.destructive
         let deleteAction = UIAction(title: deleteTitle, image: deleteImage, attributes: attributes) { [weak self] _ in
-            //                   self?.onRequestAction?(.deleteMessage(textMessageModel.message))
+            self?.onRequestAction?(.deleteMessage(sectionItem))
         }
         let divider = UIMenu(title: "", options: .displayInline, children: [copy])
         menuElements.append(divider)
@@ -142,7 +110,11 @@ extension ConversationDataSource: UICollectionViewDelegate {
 // MARK: - MessagesCollectionViewLayoutDelegate
 
 extension ConversationDataSource: MessagesCollectionViewLayoutDelegate {
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: MessagesCollectionViewLayout, sizeForMessageHeaderInSection section: Int) -> CGSize {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: MessagesCollectionViewLayout,
+        sizeForMessageHeaderInSection section: Int
+    ) -> CGSize {
         if let _ = dataSource.sectionIdentifier(for: section) {
             return CGSize(width: collectionView.bounds.width, height: 40)
         }
@@ -177,24 +149,16 @@ extension ConversationDataSource: MessagesCollectionViewLayoutDelegate {
 
 extension ConversationDataSource: MessagesDisplayingDelegate {
 
-    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: MessagesCollectionViewLayout, attibutesForDisplayingMessageAt indexPath: IndexPath) -> MessageDisplayingAttibutes? {
-
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: MessagesCollectionViewLayout,
+        attibutesForDisplayingMessageAt indexPath: IndexPath
+    ) -> MessageDisplayingAttibutes? {
         guard let sectionItem = dataSource.itemIdentifier(for: indexPath) else {
             return nil
         }
 
-        return nil
-//        switch sectionItem {
-//        case .message(let messageType):
-//            switch messageType {
-//            case .textMessage(let messageModel):
-//                return messageModel.displayingAttributes
-//            case .emojiMessage(let messageModel):
-//                return messageModel.displayingAttributes
-//            }
-//        case .messageLoader:
-//            return nil
-//        }
+        return sectionItem.displayingAttibutes
     }
 }
 
@@ -210,10 +174,11 @@ protocol MessagesCollectionViewLayoutDelegate: UICollectionViewDelegate {
         positionForMessageAt indexPath: IndexPath) -> MessagesCollectionViewLayout.MessagePosition
 }
 
-public protocol MessagesDisplayingDelegate: AnyObject {
-
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: MessagesCollectionViewLayout, attibutesForDisplayingMessageAt indexPath: IndexPath) -> MessageDisplayingAttibutes?
-
+protocol MessagesDisplayingDelegate: AnyObject {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: MessagesCollectionViewLayout,
+        attibutesForDisplayingMessageAt indexPath: IndexPath) -> MessageDisplayingAttibutes?
 }
 
 open class MessagesCollectionViewLayout: UICollectionViewLayout {
@@ -561,22 +526,22 @@ struct ChatAppearance {
     }
 }
 
-open class MesssageCollectionViewLayoutAttributes: UICollectionViewLayoutAttributes {
-    public var messageDisplayingAttributes: MessageDisplayingAttibutesRepresentable?
+class MesssageCollectionViewLayoutAttributes: UICollectionViewLayoutAttributes {
+    var messageDisplayingAttributes: MessageDisplayingAttibutes?
 
-    public override init() {
+    override init() {
         super.init()
 
         self.transform3D = ChatAppearance.Layout.transform3D
     }
 
-    open override func copy(with zone: NSZone? = nil) -> Any {
+    override func copy(with zone: NSZone? = nil) -> Any {
         let copy = super.copy(with: zone) as! MesssageCollectionViewLayoutAttributes
         copy.messageDisplayingAttributes = messageDisplayingAttributes
         return copy
     }
 
-    open override func isEqual(_ object: Any?) -> Bool {
+    override func isEqual(_ object: Any?) -> Bool {
         guard let layoutAttributes = object as? MesssageCollectionViewLayoutAttributes,
               let displayingAttributes = layoutAttributes.messageDisplayingAttributes,
               let messageDisplayingAttributes = messageDisplayingAttributes,
@@ -590,7 +555,6 @@ open class MesssageCollectionViewLayoutAttributes: UICollectionViewLayoutAttribu
         displayingAttributes.messageFont == messageDisplayingAttributes.messageFont &&
         displayingAttributes.messageTextAlignment == messageDisplayingAttributes.messageTextAlignment &&
         displayingAttributes.messageDataDetectorTypes == messageDisplayingAttributes.messageDataDetectorTypes &&
-        displayingAttributes.messageInsets == messageDisplayingAttributes.messageInsets &&
         displayingAttributes.dateLabelSize == messageDisplayingAttributes.dateLabelSize &&
         displayingAttributes.messageDateTextColor == messageDisplayingAttributes.messageDateTextColor &&
         displayingAttributes.messageDateLabelFont == messageDisplayingAttributes.messageDateLabelFont &&
@@ -598,36 +562,18 @@ open class MesssageCollectionViewLayoutAttributes: UICollectionViewLayoutAttribu
     }
 }
 
-import UIKit
+final class MessageDisplayingAttibutes {
+    var messageSize: CGSize = .zero
+    let messageFont: UIFont = UIFont.systemFont(ofSize: 16.0, weight: .regular)
+    let messageTextColor: UIColor = UIColor.black
+    let messageBackgroundColor: UIColor = .clear
+    let messageTextAlignment: NSTextAlignment = .left
+    let messageDataDetectorTypes: UIDataDetectorTypes = []
 
-public protocol MessageDisplayingAttibutesRepresentable {
-    var messageBackgroundColor: UIColor { get set }
-    var messageSize: CGSize { get set }
-    var messageInsets: UIEdgeInsets { get set }
-    var messageTextColor: UIColor { get set }
-    var messageFont: UIFont { get set }
-    var messageTextAlignment: NSTextAlignment { get set }
-    var messageDataDetectorTypes: UIDataDetectorTypes { get set }
-    var linkTextAttributes: [NSAttributedString.Key: Any] { get set }
-    var dateLabelSize: CGSize { get set }
-    var messageDateTextColor: UIColor { get set }
-    var messageDateLabelFont: UIFont { get set }
-    var messageDateLabelPadding: UIEdgeInsets { get set }
-}
+    let linkTextAttributes: [NSAttributedString.Key: Any] = [:]
+    let dateLabelSize: CGSize = .zero
 
-public class MessageDisplayingAttibutes: MessageDisplayingAttibutesRepresentable {
-    public var messageSize: CGSize = .zero
-    public var messageFont: UIFont = UIFont.preferredFont(forTextStyle: .body)
-    public var messageInsets: UIEdgeInsets = .zero
-    public var messageTextColor: UIColor = UIColor.black
-    public var messageBackgroundColor: UIColor = .clear
-    public var messageTextAlignment: NSTextAlignment = .left
-    public var messageDataDetectorTypes: UIDataDetectorTypes = []
-
-    public var linkTextAttributes: [NSAttributedString.Key: Any] = [:]
-    public var dateLabelSize: CGSize = .zero
-    
-    public var messageDateTextColor: UIColor = .tertiaryLabel
-    public var messageDateLabelFont: UIFont = .systemFont(ofSize: 13)
-    public var messageDateLabelPadding: UIEdgeInsets = .zero
+    let messageDateTextColor: UIColor = .tertiaryLabel
+    let messageDateLabelFont: UIFont = .systemFont(ofSize: 13)
+    let messageDateLabelPadding: UIEdgeInsets = .zero
 }

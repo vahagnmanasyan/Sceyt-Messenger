@@ -36,7 +36,7 @@ class DataManager {
         }
     }
 
-    func saveMessage(body: String, id: String, senderName: String, senderId: String, date: Date, url: String? = nil) {
+    func saveMessage(body: String?, id: String, senderName: String, senderId: String, date: Date, url: String? = nil) {
         do {
             let message = CDMessage(context: context)
             message.body = body

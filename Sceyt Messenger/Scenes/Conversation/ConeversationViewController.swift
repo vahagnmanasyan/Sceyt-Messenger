@@ -122,10 +122,7 @@ final class ConversationViewController: UIViewController {
 
 @objc private extension ConversationViewController {
     func sendButtonTapped() {
-        guard let text = contentView.messageTextField.textField.text, text.count >= 1 else {
-            return
-        }
-
+        let text = contentView.messageTextField.textField.text
         viewModel.inputs.onSendMessage(text)
         contentView.messageTextField.textField.text = nil
     }

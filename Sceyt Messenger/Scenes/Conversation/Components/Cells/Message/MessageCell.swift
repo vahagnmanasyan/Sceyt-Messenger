@@ -74,6 +74,7 @@ final class MessageCell: UICollectionViewCell {
 
         nameLabel.text = ""
         messageTextView.text = ""
+        attachedImageView.image = .placeholder
     }
 
     func configure(with cellModel: MessageCellModel) {
@@ -85,9 +86,6 @@ final class MessageCell: UICollectionViewCell {
                 await attachedImageView.setImage(from: photoUrl)
             }
             
-            mediaHeightAnchor?.constant = 260.0
-        } else if let image = cellModel.image {
-            attachedImageView.image = image
             mediaHeightAnchor?.constant = 260.0
         } else {
             mediaHeightAnchor?.constant = 0.0

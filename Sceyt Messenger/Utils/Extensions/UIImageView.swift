@@ -8,16 +8,22 @@
 import UIKit
 
 extension UIImageView {
-    func setImage(from url: String) async {
-        guard let url = URL(string: url) else {
+    func setImage(from path: String) async {
+        guard let url = URL(string: path) else {
             return
         }
 
         do {
-            let result = try await URLSession.shared.data(from: url)
-            let data = result.0
-            let image = UIImage(data: data)
-
+            var image: UIImage?
+            if path.contains("http") {
+                let result = try await URLSession.shared.data(from: url)
+                let data = result.0
+                image = UIImage(data: data)
+            } else {
+                let imageData = try Data(contentsOf: URL(fileURLWithPath: path))
+                image = UIImage(data: imageData)
+            }
+           
             DispatchQueue.main.async() { [weak self] in
                 self?.image = image
             }

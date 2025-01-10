@@ -17,7 +17,6 @@ struct MessageCellModel {
     let contentWidth: CGFloat
     let photoUrl: String?
     let kind: Kind
-    var image: UIImage? = nil
     let displayingAttibutes: MessageDisplayingAttibutes
 
     enum Kind {

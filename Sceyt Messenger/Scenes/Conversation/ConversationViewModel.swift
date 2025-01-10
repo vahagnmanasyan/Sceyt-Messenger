@@ -16,7 +16,7 @@ protocol ConversationViewModelType: AnyObject, ObservableObject {
 
 protocol ConversationViewModelInputType {
     func onViewDidLoad()
-    func onSendMessage(_ message: String)
+    func onSendMessage(_ message: String?)
     func onAttachImage(_ image: UIImage)
     func onRemoveAttachedImage(_ image: UIImage)
 }
@@ -53,45 +53,69 @@ final class ConversationViewModel: ConversationViewModelType, ConversationViewMo
 
     // MARK: Inputs
 
-    func onSendMessage(_ message: String) {
+    func onSendMessage(_ message: String?) {
+        guard  !(message ?? "").isEmpty || !attachedImages.isEmpty else {
+            return
+        }
+
         let id = UUID().uuidString
         let date = Date()
+        var imagePath: String?
+        if let image = attachedImages.first {
+            do {
+                imagePath = try saveImage(imageName: id, image: image)
+                attachedImages.removeFirst()
+            } catch {
+                imagePath = nil
+            }
+        }
+
         let cellModel = makeMessageCellModel(
             id: id,
             message: message,
             senderName: "",
             senderId: currentUserId,
             date: date,
-            photoUrl: nil,
-            image: attachedImages.first
+            photoUrl: imagePath
         )!
-        
-        if !attachedImages.isEmpty {
-            attachedImages.removeFirst()
-        }
 
         dataManager.saveMessage(
             body: message,
             id: id,
             senderName: "",
             senderId: currentUserId,
-            date: date
+            date: date,
+            url: imagePath
         )
 
         _messagesCellModels.insert(cellModel, at: 0)
         
         for image in attachedImages {
-            let cellModel = makeMessageCellModel(
-                id: UUID().uuidString,
-                message: nil,
-                senderName: "",
-                senderId: currentUserId,
-                date: date,
-                photoUrl: nil,
-                image: image)!
-            _messagesCellModels.insert(cellModel, at: 0)
+            let id = UUID().uuidString
+            do {
+                let path = try saveImage(imageName: id, image: image)
+                let cellModel = makeMessageCellModel(
+                    id: id,
+                    message: nil,
+                    senderName: "",
+                    senderId: currentUserId,
+                    date: date,
+                    photoUrl: path)!
+                
+                dataManager.saveMessage(
+                    body: nil,
+                    id: id,
+                    senderName: "",
+                    senderId: currentUserId,
+                    date: date,
+                    url: path
+                )
+                _messagesCellModels.insert(cellModel, at: 0)
+            } catch {
+                print(error)
+            }
         }
-        
+
         attachedImages.removeAll()
         _attachedImagesViewHidden = true
     }
@@ -167,8 +191,7 @@ private extension ConversationViewModel {
         senderName: String?,
         senderId: String?,
         date: Date?,
-        photoUrl: String?,
-        image: UIImage? = nil
+        photoUrl: String?
     ) -> MessageCellModel? {
         let message = message ?? ""
         guard let id, let senderName, let senderId, let date else {
@@ -179,7 +202,6 @@ private extension ConversationViewModel {
         let nameFont = UIFont.systemFont(ofSize: 16.0, weight: .bold)
         let messageFont = UIFont.systemFont(ofSize: 16.0, weight: .regular)
 
-        let padding = 8.0
         let nameHeight = !isIncomingMessage ? senderName.height(withConstrainedWidth: maxWidth, font: nameFont): 0.0
         let textHeight = !message.isEmpty ? message.height(withConstrainedWidth: maxWidth, font: messageFont): 0.0
         let imageHeight = photoUrl != nil ? 260.0 : 0.0
@@ -208,8 +230,32 @@ private extension ConversationViewModel {
             contentWidth: contentWidth,
             photoUrl: photoUrl,
             kind: currentUserId == senderId ? .current: .other,
-            image: image,
             displayingAttibutes: .init()
         )
+    }
+    
+    func saveImage(imageName: String, image: UIImage) throws -> String? {
+        do {
+            let documentsDirectory = try FileManager.default.url(
+                for: .documentDirectory,
+                in: .userDomainMask,
+                appropriateFor: nil,
+                create: false
+            )
+
+            let fileName = "\(imageName).jpg"
+            let fileURL = documentsDirectory.appendingPathComponent(fileName)
+            if let data = image.jpegData(compressionQuality:  1),
+                !FileManager.default.fileExists(atPath: fileURL.path) {
+                try data.write(to: fileURL)
+                print("Image saved")
+            }
+
+            return fileURL.path
+        } catch {
+            print("Failed to save image with error: \(error)")
+        }
+        
+        return nil
     }
 }
