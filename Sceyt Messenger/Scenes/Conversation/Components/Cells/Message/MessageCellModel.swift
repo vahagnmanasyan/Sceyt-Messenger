@@ -5,6 +5,7 @@
 //  Created by Vahagn Manasyan on 10.01.25.
 //
 
+import UIKit
 import Foundation
 
 struct MessageCellModel {
@@ -14,7 +15,10 @@ struct MessageCellModel {
     let sentDate: String
     let contentHeight: CGFloat
     let contentWidth: CGFloat
+    let photoUrl: String?
     let kind: Kind
+    var image: UIImage? = nil
+    let displayingAttibutes: MessageDisplayingAttibutes
 
     enum Kind {
         case other

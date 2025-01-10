@@ -17,15 +17,17 @@ protocol ConversationViewModelType: AnyObject, ObservableObject {
 protocol ConversationViewModelInputType {
     func onViewDidLoad()
     func onSendMessage(_ message: String)
+    func onAttachImage(_ image: UIImage)
+    func onRemoveAttachedImage(_ image: UIImage)
 }
 
 protocol ConversationViewModelOutputType {
     var navigationViewModel: Published<ConversationNameViewModel?>.Publisher { get }
     var messagesCellModels: Published<[MessageCellModel]>.Publisher { get }
+    var attachedImagesViewHidden: Published<Bool>.Publisher { get }
 }
 
 final class ConversationViewModel: ConversationViewModelType, ConversationViewModelInputType, ConversationViewModelOutputType {
-
     var inputs: any ConversationViewModelInputType { return self }
     var outputs: any ConversationViewModelOutputType { return self }
 
@@ -35,8 +37,10 @@ final class ConversationViewModel: ConversationViewModelType, ConversationViewMo
     private let maxWidth: CGFloat
     private let minWidth: CGFloat
     private let cancellables: Set<AnyCancellable>
+    private var attachedImages: [UIImage]
 
     init() {
+        self.attachedImages = []
         self.dateFormatter = DateFormatter()
         self.dateFormatter.locale = Locale(identifier: "en_US")
         self.dateFormatter.dateFormat = "HH:mm"
@@ -57,8 +61,12 @@ final class ConversationViewModel: ConversationViewModelType, ConversationViewMo
             message: message,
             senderName: "",
             senderId: currentUserId,
-            date: date
+            date: date,
+            photoUrl: nil,
+            image: attachedImages.first
         )!
+        
+        attachedImages.removeFirst()
 
         dataManager.saveMessage(
             body: message,
@@ -68,7 +76,22 @@ final class ConversationViewModel: ConversationViewModelType, ConversationViewMo
             date: date
         )
 
-        _messagesCellModels.append(cellModel)
+        _messagesCellModels.insert(cellModel, at: 0)
+        
+        for image in attachedImages {
+            let cellModel = makeMessageCellModel(
+                id: UUID().uuidString,
+                message: nil,
+                senderName: "",
+                senderId: currentUserId,
+                date: date,
+                photoUrl: nil,
+                image: image)!
+            _messagesCellModels.insert(cellModel, at: 0)
+        }
+        
+        attachedImages.removeAll()
+        _attachedImagesViewHidden = true
     }
 
     func onViewDidLoad() {
@@ -83,6 +106,18 @@ final class ConversationViewModel: ConversationViewModelType, ConversationViewMo
             
     }
 
+    func onAttachImage(_ image: UIImage) {
+        attachedImages.append(image)
+        _attachedImagesViewHidden = false
+    }
+
+    func onRemoveAttachedImage(_ image: UIImage) {
+        attachedImages.removeAll { $0 == image }
+        if attachedImages.count == 0 {
+            _attachedImagesViewHidden = true
+        }
+    }
+
     // MARK: Outputs
 
     @Published private var _navigationViewModel: ConversationNameViewModel?
@@ -93,6 +128,11 @@ final class ConversationViewModel: ConversationViewModelType, ConversationViewMo
     @Published private var _messagesCellModels: [MessageCellModel] = []
     var messagesCellModels: Published<[MessageCellModel]>.Publisher {
         return $_messagesCellModels
+    }
+
+    @Published private var _attachedImagesViewHidden: Bool = true
+    var attachedImagesViewHidden: Published<Bool>.Publisher {
+        return $_attachedImagesViewHidden
     }
 
     // MARK: Constants
@@ -113,7 +153,8 @@ private extension ConversationViewModel {
                 message: $0.body,
                 senderName: $0.senderName,
                 senderId: $0.senderId,
-                date: $0.date
+                date: $0.date,
+                photoUrl: $0.photoUrl
             )
         }
     }
@@ -123,22 +164,31 @@ private extension ConversationViewModel {
         message: String?,
         senderName: String?,
         senderId: String?,
-        date: Date?
+        date: Date?,
+        photoUrl: String?,
+        image: UIImage? = nil
     ) -> MessageCellModel? {
-        guard let id, let message, let senderName, let senderId, let date else {
+        let message = message ?? ""
+        guard let id, let senderName, let senderId, let date else {
             return nil
         }
 
         let font = UIFont.systemFont(ofSize: 16.0, weight: .regular)
-        let contentHeight = message.height(withConstrainedWidth: maxWidth, font: font) + 18.0
+        // 18.0
+        var contentHeight = message.height(withConstrainedWidth: maxWidth, font: font) + 100
         let messageWidth = message.width(withConstrainedHeight: contentHeight, font: font) + 16.0
-        
-        let contentWidth = if messageWidth < minWidth {
+
+        var contentWidth = if messageWidth < minWidth {
             minWidth
         } else if messageWidth > maxWidth {
             maxWidth
         } else {
             messageWidth
+        }
+
+        if let _ = image {
+            contentHeight += 115
+            contentWidth = maxWidth
         }
 
         let timeString = dateFormatter.string(from: date)
@@ -150,7 +200,10 @@ private extension ConversationViewModel {
             sentDate: timeString,
             contentHeight: contentHeight,
             contentWidth: maxWidth,
-            kind: currentUserId == senderId ? .current: .other
+            photoUrl: photoUrl,
+            kind: currentUserId == senderId ? .current: .other,
+            image: image,
+            displayingAttibutes: .init()
         )
     }
 }

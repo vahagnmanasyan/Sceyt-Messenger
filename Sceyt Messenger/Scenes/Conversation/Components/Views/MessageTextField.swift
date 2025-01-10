@@ -10,7 +10,7 @@ import UIKit
 final class MessageTextField: UIView {
 
     private lazy var stackView: UIStackView = makeStackView()
-    private lazy var attachButton: UIButton = makeAttachButton()
+    private(set) lazy var attachButton: UIButton = makeAttachButton()
     private(set) lazy var textField: UITextField = makeTextField()
     private(set) lazy var sendButton: UIButton = makeSendButton()
 
@@ -34,7 +34,10 @@ final class MessageTextField: UIView {
         stackView.addArrangedSubview(attachButton)
         stackView.addArrangedSubview(textField)
         stackView.addArrangedSubview(sendButton)
-        addTopBorder(with: .textFieldBackground, andWidth: 1)
+
+        let divider = DividerView()
+        divider.frame = CGRect(x: 0, y: 0, width: frame.size.width, height: 1)
+        addSubview(divider)
 
         NSLayoutConstraint.activate([
             stackView.topAnchor.constraint(equalTo: topAnchor),
@@ -47,14 +50,6 @@ final class MessageTextField: UIView {
             sendButton.heightAnchor.constraint(equalToConstant: 52.0),
             sendButton.widthAnchor.constraint(equalTo: sendButton.heightAnchor)
         ])
-    }
-
-    func addTopBorder(with color: UIColor?, andWidth borderWidth: CGFloat) {
-        let border = UIView()
-        border.backgroundColor = color
-        border.autoresizingMask = [.flexibleWidth, .flexibleBottomMargin]
-        border.frame = CGRect(x: 0, y: 0, width: frame.size.width, height: borderWidth)
-        addSubview(border)
     }
 }
 

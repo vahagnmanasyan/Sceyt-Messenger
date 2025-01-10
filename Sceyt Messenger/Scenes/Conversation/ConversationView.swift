@@ -10,6 +10,7 @@ import UIKit
 final class ConversationView: UIView {
     private(set) lazy var collectionView: UICollectionView = makeCollectionView()
     private(set) lazy var messageTextField: MessageTextField = makeMessageTextField()
+    private(set) lazy var attachedImagesView: AttachedImagesView = AttachedImagesView()
     private(set) var messageTextFieldBottomAnchor: NSLayoutConstraint?
 
     override init(frame: CGRect) {
@@ -28,6 +29,7 @@ final class ConversationView: UIView {
         backgroundColor = .background
         addSubview(collectionView)
         addSubview(messageTextField)
+        addSubview(attachedImagesView)
 
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: topAnchor),
@@ -36,7 +38,11 @@ final class ConversationView: UIView {
             collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
             messageTextField.leadingAnchor.constraint(equalTo: leadingAnchor),
             messageTextField.trailingAnchor.constraint(equalTo: trailingAnchor),
-            messageTextField.heightAnchor.constraint(equalToConstant: 52.0)
+            messageTextField.heightAnchor.constraint(equalToConstant: 52.0),
+            attachedImagesView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            attachedImagesView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            attachedImagesView.bottomAnchor.constraint(equalTo: messageTextField.topAnchor),
+            attachedImagesView.heightAnchor.constraint(equalToConstant: 52.0)
         ])
 
         messageTextFieldBottomAnchor = messageTextField.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor)
@@ -46,8 +52,8 @@ final class ConversationView: UIView {
 
 private extension ConversationView {
     func makeCollectionView() -> UICollectionView {
-        let layout = LeftAlignedCollectionViewFlowLayout()
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        let layout = MessagesCollectionViewLayout()
+        let collectionView = MesssagesCollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .background
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView

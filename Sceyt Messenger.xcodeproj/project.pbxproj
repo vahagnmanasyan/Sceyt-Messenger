@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2370CF322D315A9F00C3BD88 /* ConversationDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2370CF312D315A9900C3BD88 /* ConversationDataSource.swift */; };
+		2370CF352D315B4000C3BD88 /* UICollectionView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2370CF342D315B2F00C3BD88 /* UICollectionView+Extension.swift */; };
+		2370CF372D3177CB00C3BD88 /* MesssagesCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2370CF362D3177BF00C3BD88 /* MesssagesCollectionView.swift */; };
+		2370CF392D317DA900C3BD88 /* UIImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2370CF382D317DA400C3BD88 /* UIImageView.swift */; };
+		2370CF3B2D318B1900C3BD88 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2370CF3A2D318B1500C3BD88 /* DataManager.swift */; };
+		2370CF3D2D318BC300C3BD88 /* AttachedImagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2370CF3C2D318BBD00C3BD88 /* AttachedImagesView.swift */; };
+		2370CF402D318C3500C3BD88 /* DividerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2370CF3F2D318C3000C3BD88 /* DividerView.swift */; };
 		2399BC342D2CA51A007088E9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2399BC2C2D2CA51A007088E9 /* Assets.xcassets */; };
 		2399BC362D2CA51A007088E9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2399BC2F2D2CA51A007088E9 /* LaunchScreen.storyboard */; };
 		2399BC382D2CA51A007088E9 /* MessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2399BC232D2CA51A007088E9 /* MessageCell.swift */; };
@@ -29,6 +36,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2370CF312D315A9900C3BD88 /* ConversationDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationDataSource.swift; sourceTree = "<group>"; };
+		2370CF342D315B2F00C3BD88 /* UICollectionView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UICollectionView+Extension.swift"; sourceTree = "<group>"; };
+		2370CF362D3177BF00C3BD88 /* MesssagesCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MesssagesCollectionView.swift; sourceTree = "<group>"; };
+		2370CF382D317DA400C3BD88 /* UIImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageView.swift; sourceTree = "<group>"; };
+		2370CF3A2D318B1500C3BD88 /* DataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
+		2370CF3C2D318BBD00C3BD88 /* AttachedImagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachedImagesView.swift; sourceTree = "<group>"; };
+		2370CF3F2D318C3000C3BD88 /* DividerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DividerView.swift; sourceTree = "<group>"; };
 		2399BBF02D2C4E53007088E9 /* Sceyt Messenger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Sceyt Messenger.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2399BC232D2CA51A007088E9 /* MessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageCell.swift; sourceTree = "<group>"; };
 		2399BC252D2CA51A007088E9 /* ConeversationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConeversationViewController.swift; sourceTree = "<group>"; };
@@ -63,6 +77,51 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2370CF2E2D31592F00C3BD88 /* UILayer */ = {
+			isa = PBXGroup;
+			children = (
+				2370CF3E2D318C1E00C3BD88 /* Views */,
+				2370CF2F2D31593B00C3BD88 /* Common */,
+			);
+			path = UILayer;
+			sourceTree = "<group>";
+		};
+		2370CF2F2D31593B00C3BD88 /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				2370CF362D3177BF00C3BD88 /* MesssagesCollectionView.swift */,
+			);
+			path = Common;
+			sourceTree = "<group>";
+		};
+		2370CF302D315A9300C3BD88 /* DataSource */ = {
+			isa = PBXGroup;
+			children = (
+				2370CF312D315A9900C3BD88 /* ConversationDataSource.swift */,
+			);
+			path = DataSource;
+			sourceTree = "<group>";
+		};
+		2370CF332D315B1F00C3BD88 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				2370CF382D317DA400C3BD88 /* UIImageView.swift */,
+				2370CF342D315B2F00C3BD88 /* UICollectionView+Extension.swift */,
+				2399BC292D2CA51A007088E9 /* UIColor+Extension.swift */,
+				2399BC502D2FF81D007088E9 /* String+Extension.swift */,
+				2399BCA72D306BE7007088E9 /* UIScrollView+Extension.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		2370CF3E2D318C1E00C3BD88 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				2370CF3F2D318C3000C3BD88 /* DividerView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		2399BBE72D2C4E52007088E9 = {
 			isa = PBXGroup;
 			children = (
@@ -91,6 +150,7 @@
 		2399BC272D2CA51A007088E9 /* Conversation */ = {
 			isa = PBXGroup;
 			children = (
+				2370CF302D315A9300C3BD88 /* DataSource */,
 				2399BC242D2CA51A007088E9 /* Components */,
 				2399BC252D2CA51A007088E9 /* ConeversationViewController.swift */,
 				2399BC492D2EB6CD007088E9 /* ConversationViewModel.swift */,
@@ -110,9 +170,7 @@
 		2399BC2A2D2CA51A007088E9 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
-				2399BCA72D306BE7007088E9 /* UIScrollView+Extension.swift */,
-				2399BC502D2FF81D007088E9 /* String+Extension.swift */,
-				2399BC292D2CA51A007088E9 /* UIColor+Extension.swift */,
+				2370CF332D315B1F00C3BD88 /* Extensions */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -120,6 +178,7 @@
 		2399BC332D2CA51A007088E9 /* Sceyt Messenger */ = {
 			isa = PBXGroup;
 			children = (
+				2370CF2E2D31592F00C3BD88 /* UILayer */,
 				2399BC522D300649007088E9 /* SupportingFiles */,
 				2399BC4C2D2F3E39007088E9 /* Database */,
 				2399BC282D2CA51A007088E9 /* Scenes */,
@@ -141,6 +200,7 @@
 		2399BC412D2D6385007088E9 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				2370CF3C2D318BBD00C3BD88 /* AttachedImagesView.swift */,
 				2399BC462D2EB5AD007088E9 /* ConversationNameView */,
 				2399BC422D2D638C007088E9 /* MessageTextField.swift */,
 			);
@@ -159,6 +219,7 @@
 		2399BC4C2D2F3E39007088E9 /* Database */ = {
 			isa = PBXGroup;
 			children = (
+				2370CF3A2D318B1500C3BD88 /* DataManager.swift */,
 				2399BC8B2D301ECC007088E9 /* Models */,
 				2399BC4D2D2F3F7F007088E9 /* Database.xcdatamodeld */,
 			);
@@ -276,19 +337,26 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2370CF352D315B4000C3BD88 /* UICollectionView+Extension.swift in Sources */,
 				2399BC382D2CA51A007088E9 /* MessageCell.swift in Sources */,
 				2399BC392D2CA51A007088E9 /* ConeversationViewController.swift in Sources */,
 				2399BC3A2D2CA51A007088E9 /* ConversationView.swift in Sources */,
 				2399BCAE2D306E0E007088E9 /* MessageCellModel.swift in Sources */,
 				2399BC482D2EB5D3007088E9 /* ConversationNameViewModel.swift in Sources */,
+				2370CF372D3177CB00C3BD88 /* MesssagesCollectionView.swift in Sources */,
 				2399BC512D2FF822007088E9 /* String+Extension.swift in Sources */,
+				2370CF402D318C3500C3BD88 /* DividerView.swift in Sources */,
 				2399BC452D2E98EC007088E9 /* ConversationNameView.swift in Sources */,
 				2399BC4F2D2F3F7F007088E9 /* Database.xcdatamodeld in Sources */,
+				2370CF3B2D318B1900C3BD88 /* DataManager.swift in Sources */,
 				2399BCA82D306BF2007088E9 /* UIScrollView+Extension.swift in Sources */,
 				2399BC3B2D2CA51A007088E9 /* UIColor+Extension.swift in Sources */,
+				2370CF322D315A9F00C3BD88 /* ConversationDataSource.swift in Sources */,
 				2399BC432D2D6393007088E9 /* MessageTextField.swift in Sources */,
 				2399BCC22D307EBD007088E9 /* CDMessage+CoreDataClass.swift in Sources */,
+				2370CF3D2D318BC300C3BD88 /* AttachedImagesView.swift in Sources */,
 				2399BCC32D307EBD007088E9 /* CDMessage+CoreDataProperties.swift in Sources */,
+				2370CF392D317DA900C3BD88 /* UIImageView.swift in Sources */,
 				2399BC3C2D2CA51A007088E9 /* AppDelegate.swift in Sources */,
 				2399BC4A2D2EB6F8007088E9 /* ConversationViewModel.swift in Sources */,
 				2399BC3D2D2CA51A007088E9 /* SceneDelegate.swift in Sources */,

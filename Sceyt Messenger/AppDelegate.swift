@@ -29,7 +29,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     id: UUID().uuidString,
                     senderName: "User\(randomId)",
                     senderId: UUID().uuidString,
-                    date: Date()
+                    date: Date(),
+                    url: "https://picsum.photos/200/300"
                 )
             }
             
